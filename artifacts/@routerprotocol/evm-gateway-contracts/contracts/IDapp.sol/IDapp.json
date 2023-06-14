@@ -1,0 +1,63 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IDapp",
+  "sourceName": "@routerprotocol/evm-gateway-contracts/contracts/IDapp.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "requestIdentifier",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "execFlags",
+          "type": "bool"
+        },
+        {
+          "internalType": "bytes",
+          "name": "execData",
+          "type": "bytes"
+        }
+      ],
+      "name": "iAck",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "requestSender",
+          "type": "string"
+        },
+        {
+          "internalType": "bytes",
+          "name": "packet",
+          "type": "bytes"
+        },
+        {
+          "internalType": "string",
+          "name": "srcChainId",
+          "type": "string"
+        }
+      ],
+      "name": "iReceive",
+      "outputs": [
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
