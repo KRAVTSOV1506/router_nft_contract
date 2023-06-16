@@ -25,21 +25,19 @@ interface XERC721Interface extends ethers.utils.Interface {
     "ChainName()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
-    "gateway(string)": FunctionFragment;
     "gatewayContract()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getRequestMetadata(uint64,uint64,uint64,uint64,uint128,uint8,bool,string)": FunctionFragment;
     "iAck(uint256,bool,bytes)": FunctionFragment;
     "iReceive(string,bytes,string)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
-    "mint(address,uint256,string)": FunctionFragment;
     "name()": FunctionFragment;
     "ourContractOnChains(string)": FunctionFragment;
     "owner()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
-    "safeMint(address,uint256,string)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
+    "setChainName(string,string)": FunctionFragment;
     "setContractOnChain(string,string)": FunctionFragment;
     "setDappMetadata(string)": FunctionFragment;
     "setGateway(address)": FunctionFragment;
@@ -60,7 +58,6 @@ interface XERC721Interface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
-  encodeFunctionData(functionFragment: "gateway", values: [string]): string;
   encodeFunctionData(
     functionFragment: "gatewayContract",
     values?: undefined
@@ -94,10 +91,6 @@ interface XERC721Interface extends ethers.utils.Interface {
     functionFragment: "isApprovedForAll",
     values: [string, string]
   ): string;
-  encodeFunctionData(
-    functionFragment: "mint",
-    values: [string, BigNumberish, string]
-  ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "ourContractOnChains",
@@ -109,16 +102,16 @@ interface XERC721Interface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "safeMint",
-    values: [string, BigNumberish, string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "safeTransferFrom",
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setApprovalForAll",
     values: [string, boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setChainName",
+    values: [string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "setContractOnChain",
@@ -163,7 +156,6 @@ interface XERC721Interface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "ChainName", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "gateway", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "gatewayContract",
     data: BytesLike
@@ -182,7 +174,6 @@ interface XERC721Interface extends ethers.utils.Interface {
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "ourContractOnChains",
@@ -190,13 +181,16 @@ interface XERC721Interface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "safeMint", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "safeTransferFrom",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "setApprovalForAll",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setChainName",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -321,8 +315,6 @@ export class XERC721 extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    gateway(arg0: string, overrides?: CallOverrides): Promise<[string]>;
-
     gatewayContract(overrides?: CallOverrides): Promise<[string]>;
 
     getApproved(
@@ -362,13 +354,6 @@ export class XERC721 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    mint(
-      to: string,
-      tokenId: BigNumberish,
-      uri: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     "name()"(overrides?: CallOverrides): Promise<[string]>;
 
     "name(string)"(arg0: string, overrides?: CallOverrides): Promise<[string]>;
@@ -384,13 +369,6 @@ export class XERC721 extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
-
-    safeMint(
-      to: string,
-      tokenId: BigNumberish,
-      uri: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: string,
@@ -410,6 +388,12 @@ export class XERC721 extends BaseContract {
     setApprovalForAll(
       operator: string,
       approved: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setChainName(
+      chainName: string,
+      chainId: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -483,8 +467,6 @@ export class XERC721 extends BaseContract {
 
   balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  gateway(arg0: string, overrides?: CallOverrides): Promise<string>;
-
   gatewayContract(overrides?: CallOverrides): Promise<string>;
 
   getApproved(
@@ -524,13 +506,6 @@ export class XERC721 extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  mint(
-    to: string,
-    tokenId: BigNumberish,
-    uri: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   "name()"(overrides?: CallOverrides): Promise<string>;
 
   "name(string)"(arg0: string, overrides?: CallOverrides): Promise<string>;
@@ -540,13 +515,6 @@ export class XERC721 extends BaseContract {
   owner(overrides?: CallOverrides): Promise<string>;
 
   ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-  safeMint(
-    to: string,
-    tokenId: BigNumberish,
-    uri: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   "safeTransferFrom(address,address,uint256)"(
     from: string,
@@ -566,6 +534,12 @@ export class XERC721 extends BaseContract {
   setApprovalForAll(
     operator: string,
     approved: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setChainName(
+    chainName: string,
+    chainId: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -633,8 +607,6 @@ export class XERC721 extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    gateway(arg0: string, overrides?: CallOverrides): Promise<string>;
-
     gatewayContract(overrides?: CallOverrides): Promise<string>;
 
     getApproved(
@@ -674,13 +646,6 @@ export class XERC721 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    mint(
-      to: string,
-      tokenId: BigNumberish,
-      uri: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     "name()"(overrides?: CallOverrides): Promise<string>;
 
     "name(string)"(arg0: string, overrides?: CallOverrides): Promise<string>;
@@ -693,13 +658,6 @@ export class XERC721 extends BaseContract {
     owner(overrides?: CallOverrides): Promise<string>;
 
     ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-    safeMint(
-      to: string,
-      tokenId: BigNumberish,
-      uri: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: string,
@@ -719,6 +677,12 @@ export class XERC721 extends BaseContract {
     setApprovalForAll(
       operator: string,
       approved: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setChainName(
+      chainName: string,
+      chainId: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -840,8 +804,6 @@ export class XERC721 extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    gateway(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
     gatewayContract(overrides?: CallOverrides): Promise<BigNumber>;
 
     getApproved(
@@ -881,13 +843,6 @@ export class XERC721 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    mint(
-      to: string,
-      tokenId: BigNumberish,
-      uri: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     "name()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     "name(string)"(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
@@ -902,13 +857,6 @@ export class XERC721 extends BaseContract {
     ownerOf(
       tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    safeMint(
-      to: string,
-      tokenId: BigNumberish,
-      uri: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "safeTransferFrom(address,address,uint256)"(
@@ -929,6 +877,12 @@ export class XERC721 extends BaseContract {
     setApprovalForAll(
       operator: string,
       approved: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setChainName(
+      chainName: string,
+      chainId: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1003,11 +957,6 @@ export class XERC721 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    gateway(
-      arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     gatewayContract(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getApproved(
@@ -1047,13 +996,6 @@ export class XERC721 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    mint(
-      to: string,
-      tokenId: BigNumberish,
-      uri: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     "name()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "name(string)"(
@@ -1071,13 +1013,6 @@ export class XERC721 extends BaseContract {
     ownerOf(
       tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    safeMint(
-      to: string,
-      tokenId: BigNumberish,
-      uri: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "safeTransferFrom(address,address,uint256)"(
@@ -1098,6 +1033,12 @@ export class XERC721 extends BaseContract {
     setApprovalForAll(
       operator: string,
       approved: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setChainName(
+      chainName: string,
+      chainId: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

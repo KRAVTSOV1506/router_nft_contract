@@ -28,9 +28,6 @@ contract XERC721 is ERC721,ERC721URIStorage,ERC721Enumerable,IDapp {
   // set contract on source and destination chain
   mapping(string => string) public ourContractOnChains;
 
-  // gateway address corresponding to chain name
-  mapping(string=>address) public gateway;
-
   // transfer params struct where we specify which NFT should be transferred to
   // the destination chain and to which address
   struct TransferParams {
@@ -44,20 +41,27 @@ contract XERC721 is ERC721,ERC721URIStorage,ERC721Enumerable,IDapp {
     string uri;
   }
 
-  constructor() ERC721("MyNFT", "NFT") {
-    name["mumbai"]="80001";
-    name["fuji"]="43113";
-    name["routerTest"]="router_9601-1";
-    gateway["mumbai"]=0x94caA85bC578C05B22BDb00E6Ae1A34878f047F7;
-    gateway["fuji"]=0x94caA85bC578C05B22BDb00E6Ae1A34878f047F7;
-    ChainName="mumbai";
-    address  gatewayAddress=gateway["mumbai"];
-    gatewayContract = IGateway(gatewayAddress);
-    owner = msg.sender; 
-    ourContractOnChains[name["routerTest"]] = "router100vfjy5k58qd7wdxhcytl8fgrrjqemjufe64zk0yxzfyk4yr25nsumtpyw";
+  constructor(
+    string memory nftName, 
+    string memory nftSymbol, 
+    string memory chain,
+    string memory chainId,
+    address getewayAddress,
+    string memory feePayerAddress,
+    string memory routerChainName,
+    string memory routerChainId,
+    string memory routerContractAddress
+  ) ERC721(nftName, nftSymbol) {
+    ChainName = chain;
+    name[ChainName] = chainId;
+    gatewayContract = IGateway(getewayAddress);
+    owner = msg.sender;
+    
+    name[routerChainName] = routerChainId;
+    ourContractOnChains[routerChainName] = routerContractAddress;
 
     // setting metadata for dapp
-    gatewayContract.setDappMetadata("0x8593fec7ffbd3538b914765287d81512eff41584");
+    gatewayContract.setDappMetadata(feePayerAddress);
   }
 
   /// @notice function to set the fee payer address on Router Chain.
@@ -74,10 +78,7 @@ contract XERC721 is ERC721,ERC721URIStorage,ERC721Enumerable,IDapp {
     gatewayContract = IGateway(gateway);
   }
 
-  function safeMint(address to, uint256 tokenId, string memory uri) public {
-    require(msg.sender == gateway["mumbai"] || (keccak256(abi.encodePacked(ChainName)) == keccak256(abi.encodePacked("fuji")) && msg.sender == owner), "not allowed");
-
-
+  function _safeMintWithUri(address to, uint256 tokenId, string memory uri) internal {
     _safeMint(to, tokenId);
     _setTokenURI(tokenId, uri);
   }
@@ -91,12 +92,6 @@ contract XERC721 is ERC721,ERC721URIStorage,ERC721Enumerable,IDapp {
       return super.tokenURI(tokenId);
   }
 
-  function mint(address to, uint256 tokenId,string memory uri) external {
-    require(msg.sender == owner, "only owner");
-    require(keccak256(abi.encodePacked(ChainName)) == keccak256(abi.encodePacked("fuji")));
-        _safeMint(to, tokenId);
-        _setTokenURI(tokenId, uri);
-  }
 
   /// @notice function to set the address of our ERC20 contracts on different chains.
   /// This will help in access control when a cross-chain request is received.
@@ -109,6 +104,16 @@ contract XERC721 is ERC721,ERC721URIStorage,ERC721Enumerable,IDapp {
     
     ourContractOnChains[name[chainName]] = contractAddress;
   }
+
+  function setChainName(
+    string calldata chainName,
+    string calldata chainId
+  ) external {
+    require(msg.sender == owner, "only owner");
+    
+    name[chainName] = chainId;
+  }
+
  function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
         super._burn(tokenId);
     }
@@ -205,7 +210,7 @@ contract XERC721 is ERC721,ERC721URIStorage,ERC721Enumerable,IDapp {
 
     // decoding our payload
     TransferParams memory transferParams = abi.decode(packet, (TransferParams));
-    safeMint(toAddress(transferParams.recipient), transferParams.nftId, transferParams.uri);
+    _safeMintWithUri(toAddress(transferParams.recipient), transferParams.nftId, transferParams.uri);
 
     return "";
   }
@@ -238,7 +243,7 @@ contract XERC721 is ERC721,ERC721URIStorage,ERC721Enumerable,IDapp {
   function supportsInterface(bytes4 interfaceId)
     public
     view
-    override(ERC721, ERC721Enumerable)
+    override(ERC721, ERC721Enumerable, ERC721URIStorage)
     returns (bool)
   {
       return super.supportsInterface(interfaceId);
