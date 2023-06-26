@@ -58,7 +58,7 @@ contract XERC721 is ERC721,ERC721URIStorage,ERC721Enumerable,IDapp {
     owner = msg.sender;
     
     name[routerChainName] = routerChainId;
-    ourContractOnChains[routerChainName] = routerContractAddress;
+    ourContractOnChains[name[routerChainName]] = routerContractAddress;
 
     // setting metadata for dapp
     gatewayContract.setDappMetadata(feePayerAddress);
