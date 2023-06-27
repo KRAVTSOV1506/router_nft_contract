@@ -36,11 +36,6 @@ contract XERC721 is ERC721,ERC721URIStorage,ERC721Enumerable,IDapp {
     string uri;
   }
 
-  struct TransferTemp{
-    uint256 nftId;
-    string uri;
-  }
-
   constructor(
     string memory nftName, 
     string memory nftSymbol, 
@@ -121,8 +116,8 @@ contract XERC721 is ERC721,ERC721URIStorage,ERC721Enumerable,IDapp {
   // This function sends the NFT from the source chain to the destination chain 
   function transferCrossChain(
     string calldata chainName,
-   TransferTemp calldata transferTemp
-   
+    uint256 tokenId,
+    string calldata recipient
   ) public payable {
     require(
       keccak256(bytes(ourContractOnChains[name[chainName]])) !=
@@ -131,13 +126,14 @@ contract XERC721 is ERC721,ERC721URIStorage,ERC721Enumerable,IDapp {
     );
 
     require(
-      _ownerOf(transferTemp.nftId) == msg.sender,
+      _ownerOf(tokenId) == msg.sender,
       "caller is not the owner"
     );
 
     TransferParams memory transferParams;
-    transferParams.nftId=transferTemp.nftId;
-    transferParams.recipient=toBytes(msg.sender);
+    transferParams.nftId = tokenId;
+    transferParams.recipient = bytes(recipient);
+    transferParams.uri = super.tokenURI(tokenId);
     // burning the NFT from the address of the user calling _burn function
     _burn(transferParams.nftId);
     string memory destChainId=name[chainName];
@@ -182,16 +178,6 @@ contract XERC721 is ERC721,ERC721URIStorage,ERC721Enumerable,IDapp {
     );
     return requestMetadata;
   }
-
-  function toBytes(address a) public pure returns (bytes memory b){
-    assembly {
-        let m := mload(0x40)
-        a := and(a, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
-        mstore(add(m, 20), xor(0x140000000000000000000000000000000000000000, a))
-        mstore(0x40, add(m, 52))
-        b := m
-   }
-}
 
   /// @notice function to handle the cross-chain request received from some other chain.
   /// @param requestSender address of the contract on source chain that initiated the request.
